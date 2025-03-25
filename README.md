@@ -29,7 +29,7 @@ eval "$(/usr/local/bin/brew shellenv)"
 
 ### 2. ffmpeg のインストール
 
-CaptureStream2 の動作には ffmpeg が必要です。以下のコマンドでインストールしてください。
+語学講座CS2 の動作には ffmpeg が必要です。以下のコマンドでインストールしてください。
 
 ```sh
 brew install ffmpeg
@@ -41,7 +41,7 @@ brew install ffmpeg
 ffmpeg -version
 ```
 
-### 3. CaptureStream2 のインストール
+### 3. 語学講座CS2 のインストール
 
 Homebrew Tap を追加し、CaptureStream2 をインストールします。
 
@@ -55,7 +55,7 @@ brew install --cask capturestream2
 
 ## ⚠️ Gatekeeper の警告を回避する方法
 
-CaptureStream2 は Apple の公証（Notarization）を受けていないため、初回起動時に Gatekeeper の警告が表示される可能性があります。その場合、以下の手順で回避できます。
+語学講座CS2 は Apple の公証（Notarization）を受けていないため、初回起動時に Gatekeeper の警告が表示される可能性があります。その場合、以下の手順で回避できます。
 
 方法 1: セキュリティ設定から許可
 
@@ -76,7 +76,7 @@ xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 
 ## 🚀 アンインストール
 
-CaptureStream2 を削除するには、以下のコマンドを実行してください。
+語学講座CS2 を削除するには、以下のコマンドを実行してください。
 ```sh
 brew uninstall --cask capturestream2
 ```
