@@ -45,7 +45,7 @@ brew install --cask capturestream2
 
 インストール完了後、/Applications/CaptureStream2.app にアプリが追加されます。
 
-### ⚠️ Gatekeeper の警告を回避する方法
+## ⚠️ Gatekeeper の警告を回避する方法
 
 CaptureStream2 は Apple の公証（Notarization）を受けていないため、初回起動時に Gatekeeper の警告が表示される可能性があります。その場合、以下の手順で回避できます。
 
@@ -61,7 +61,7 @@ CaptureStream2 は Apple の公証（Notarization）を受けていないため�
 
 xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 
-### 🚀 アンインストール
+## 🚀 アンインストール
 
 CaptureStream2 を削除するには、以下のコマンドを実行してください。
 
@@ -71,4 +71,4 @@ brew uninstall --cask capturestream2
 
 brew untap username/capturestream2
 
-### 📌 ライセンス
+## 📌 ライセンス
