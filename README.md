@@ -27,11 +27,6 @@ eval "$(/usr/local/bin/brew shellenv)"
 
 
 
-## 🚀 インストール方法
-
-### 1. Homebrew をインストール（未導入の場合）
-
-
 ### 2. ffmpeg のインストール
 
 CaptureStream2 の動作には ffmpeg が必要です。以下のコマンドでインストールしてください。
