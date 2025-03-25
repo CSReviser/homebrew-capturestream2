@@ -48,7 +48,7 @@ Homebrew Tap を追加し、語学講座CS2 をインストールします。
 
 
 ```sh
-brew tap username/capturestream2
+brew tap csreviser/capturestream2
 brew install --cask capturestream2
 ```
 インストール完了後、/Applications/CaptureStream2.app にアプリが追加されます。
@@ -83,6 +83,6 @@ brew uninstall --cask capturestream2
 また、Homebrew Tap を削除する場合は以下のコマンドを実行します。
 
 ```sh
-brew untap username/capturestream2
+brew untap csreviser/capturestream2
 ```
 ## 📌 ライセンス
