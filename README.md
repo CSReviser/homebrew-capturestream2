@@ -43,7 +43,7 @@ ffmpeg -version
 
 ### 3. 語学講座CS2 のインストール
 
-Homebrew Tap を追加し、CaptureStream2 をインストールします。
+Homebrew Tap を追加し、語学講座CS2 をインストールします。
 
 
 
