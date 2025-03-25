@@ -25,7 +25,6 @@ Intel Mac の場合
 ```sh
 echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zshrc
 eval "$(/usr/local/bin/brew shellenv)"
-
 ```
 
 ### 2. ffmpeg のインストール
@@ -34,17 +33,12 @@ CaptureStream2 の動作には ffmpeg が必要です。以下のコマンドで
 
 ```sh
 brew install ffmpeg
-
-
 ```
 
 インストール後、以下のコマンドで ffmpeg が正しくインストールされているか確認できます。
 
 ```sh
 ffmpeg -version
-
-
-
 ```
 
 ### 3. CaptureStream2 のインストール
@@ -56,9 +50,6 @@ Homebrew Tap を追加し、CaptureStream2 をインストールします。
 ```sh
 brew tap username/capturestream2
 brew install --cask capturestream2
-
-
-
 ```
 インストール完了後、/Applications/CaptureStream2.app にアプリが追加されます。
 
@@ -80,19 +71,17 @@ CaptureStream2 は Apple の公証（Notarization）を受けていないため�
 
 ```sh
 xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
-
-
-
 ```
 
 ## 🚀 アンインストール
 
 CaptureStream2 を削除するには、以下のコマンドを実行してください。
-
+```sh
 brew uninstall --cask capturestream2
-
+```
 また、Homebrew Tap を削除する場合は以下のコマンドを実行します。
 
+```sh
 brew untap username/capturestream2
-
+```
 ## 📌 ライセンス
