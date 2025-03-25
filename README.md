@@ -58,6 +58,7 @@ brew install --cask capturestream2
 CaptureStream2 は Apple の公証（Notarization）を受けていないため、初回起動時に Gatekeeper の警告が表示される可能性があります。その場合、以下の手順で回避できます。
 
 方法 1: セキュリティ設定から許可
+
 	1.	CaptureStream2.app を開こうとする
 	2.	「開発元が未確認のため開けません」という警告が表示される
 	3.	「システム設定」 → 「プライバシーとセキュリティ」 に移動
