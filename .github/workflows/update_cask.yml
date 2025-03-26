@@ -1,0 +1,52 @@
+name: Update Homebrew Cask
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 毎日午前3時 (UTC) に実行 (日本時間12:00)
+  workflow_dispatch:  # 手動実行も可能
+  repository_dispatch:  # アプリ側からトリガー可能
+
+jobs:
+  update-cask:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: 最新のリリースタグを取得
+        id: get_latest_version
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/CSReviser/CaptureStream2/releases/latest | jq -r '.tag_name')
+          echo "最新バージョン: $LATEST_VERSION"
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+
+      - name: `capturestream2.rb` を更新
+        run: |
+          FILE_PATH="Casks/capturestream2.rb"
+
+          # 既存のバージョンを取得
+          OLD_VERSION=$(grep 'version "' $FILE_PATH | awk -F '"' '{print $2}')
+          echo "現在のバージョン: $OLD_VERSION"
+          
+          # 新しいバージョンと一致していればスキップ
+          if [[ "$OLD_VERSION" == "$LATEST_VERSION" ]]; then
+            echo "バージョンに変更がないため、更新をスキップします。"
+            exit 0
+          fi
+
+          # `capturestream2.rb` を更新
+          sed -i "s/version \"$OLD_VERSION\"/version \"$LATEST_VERSION\"/g" $FILE_PATH
+          sed -i "s|/download/$OLD_VERSION/|/download/$LATEST_VERSION/|g" $FILE_PATH
+          sed -i "s|CaptureStream2-MacOS-$OLD_VERSION.dmg|CaptureStream2-MacOS-$LATEST_VERSION.dmg|g" $FILE_PATH
+
+      - name: 変更を GitHub にコミット & プッシュ
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add Casks/capturestream2.rb
+          git commit -m "Update CaptureStream2.rb to version $LATEST_VERSION"
+          git push
