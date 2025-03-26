@@ -23,7 +23,7 @@ jobs:
           echo "最新バージョン: $LATEST_VERSION"
           echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 
-      - name: `capturestream2.rb` を更新
+      - name: ruby file update
         run: |
           FILE_PATH="Casks/capturestream2.rb"
 
