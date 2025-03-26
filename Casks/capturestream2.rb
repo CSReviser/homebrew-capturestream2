@@ -2,7 +2,7 @@ cask "capturestream2" do
   version "20250324"
   sha256 :no_check
 
-  url "https://github.com/CSReviser/CaptureStream2/releases/download/20250324/CaptureStream2-MacOS-20250324.dmg"
+  url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
   name "CaptureStream2"
   desc "語学講座CS2は、NHKラジオ語学講座の「らじる★らじる」（聴き逃し）ストリーミング配信を自動録音するためのアプリです。録音した語学講座のファイルは、著作権法で認められた範囲内でご利用ください。"
   homepage "https://csreviser.github.io/CaptureStream2/"
