@@ -86,3 +86,4 @@ brew uninstall --cask capturestream2
 brew untap csreviser/capturestream2
 ```
 ## 📌 ライセンス
+GNU GENERAL PUBLIC LICENSE Version 2
