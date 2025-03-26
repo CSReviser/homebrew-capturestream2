@@ -43,11 +43,12 @@ jobs:
           sed -i "s|CaptureStream2-MacOS-$OLD_VERSION.dmg|CaptureStream2-MacOS-$LATEST_VERSION.dmg|g" $FILE_PATH
 
       - name: 変更を GitHub にコミット & プッシュ
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@gmail.com"
           git add Casks/capturestream2.rb
           git commit -m "Update CaptureStream2.rb to version $LATEST_VERSION"
           git push
-            env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
