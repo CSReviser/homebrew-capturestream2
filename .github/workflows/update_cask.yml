@@ -49,5 +49,5 @@ jobs:
           git add Casks/capturestream2.rb
           git commit -m "Update CaptureStream2.rb to version $LATEST_VERSION"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
