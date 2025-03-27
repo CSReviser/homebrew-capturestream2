@@ -115,6 +115,7 @@ chmod +x update_apps.sh update_apps.command
 ```
 
 3️⃣ ダブルクリックで実行
+
 	•	update_apps.command を ダブルクリック するだけで、アップデートが自動実行されます。
 
 ---
