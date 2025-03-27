@@ -86,7 +86,9 @@ brew upgrade --cask capturestream2
 ⚠️ 注意:
 アップデート後、Gatekeeper（macOS のセキュリティ機能）がアプリをブロックする 場合があります。
 その場合は、以下のコマンドで制限を解除してください。
-
+```sh
+xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
+```
 または、「システム設定」 → 「プライバシーとセキュリティ」 から手動で許可してください。
 
 🚀 方法 2: アップデート用スクリプトを使う（推奨）
@@ -97,19 +99,20 @@ brew upgrade --cask capturestream2
 1️⃣ スクリプトをダウンロード
 
 以下のコマンドを実行し、スクリプトを取得します。
-
+```sh
 mkdir -p ~/CaptureStream2Updater
 cd ~/CaptureStream2Updater
 curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/update_apps.sh
 curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/update_apps.command
 chmod +x update_apps.sh update_apps.command
+```
 
 2️⃣ ターミナルで実行
 
 以下のコマンドを実行すると、CaptureStream2 のアップデートが開始されます。
-
+```sh
 ~/CaptureStream2Updater/update_apps.sh
-
+```
 
 3️⃣ ダブルクリックで実行
 	•	update_apps.command を ダブルクリック するだけで、アップデートが自動実行されます。
