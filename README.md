@@ -73,6 +73,16 @@ brew install --cask capturestream2
 xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 ```
 
+## 🚀 アップデート方法
+
+### 1. 手動でアップデート
+```sh
+brew update
+brew upgrade ffmpeg
+brew upgrade --cask capturestream2
+```
+
+
 ## 🚀 アンインストール
 
 語学講座CS2 を削除するには、以下のコマンドを実行してください。
