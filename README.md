@@ -72,17 +72,49 @@ brew install --cask capturestream2
 ```sh
 xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 ```
+---
+## 🔹 アップデート手順
 
-## 🚀 アップデート方法
+### 🛠 方法 1: 手動アップデート
 
-### 1. 手動でアップデート
+Homebrew を使って、最新バージョンへアップデートするには、以下のコマンドを実行してください。
 ```sh
 brew update
 brew upgrade ffmpeg
 brew upgrade --cask capturestream2
 ```
+⚠️ 注意:
+アップデート後、Gatekeeper（macOS のセキュリティ機能）がアプリをブロックする 場合があります。
+その場合は、以下のコマンドで制限を解除してください。
+
+または、「システム設定」 → 「プライバシーとセキュリティ」 から手動で許可してください。
+
+🚀 方法 2: アップデート用スクリプトを使う（推奨）
+
+アップデート作業を自動化するスクリプトを用意しました。
+このスクリプトを使うことで、Homebrew の更新 → アプリのアップデート → Gatekeeper の制限解除 を一括で実行できます。
+
+1️⃣ スクリプトをダウンロード
+
+以下のコマンドを実行し、スクリプトを取得します。
+
+mkdir -p ~/CaptureStream2Updater
+cd ~/CaptureStream2Updater
+curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/update_apps.sh
+curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/update_apps.command
+chmod +x update_apps.sh update_apps.command
+
+2️⃣ ターミナルで実行
+
+以下のコマンドを実行すると、CaptureStream2 のアップデートが開始されます。
+
+~/CaptureStream2Updater/update_apps.sh
 
 
+3️⃣ ダブルクリックで実行
+	•	update_apps.command を ダブルクリック するだけで、アップデートが自動実行されます。
+
+---
 ## 🚀 アンインストール
 
 語学講座CS2 を削除するには、以下のコマンドを実行してください。
