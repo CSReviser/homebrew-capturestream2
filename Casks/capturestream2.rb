@@ -6,7 +6,9 @@ cask "capturestream2" do
   name "CaptureStream2"
   desc "語学講座CS2は、NHKラジオ語学講座の「らじる★らじる」（聴き逃し）ストリーミング配信を自動録音するためのアプリです。録音した語学講座のファイルは、著作権法で認められた範囲内でご利用ください。"
   homepage "https://csreviser.github.io/CaptureStream2/"
-
+  
+  depends_on formula: "ffmpeg"  # ffmpeg を推奨
+  
   app "MacCaptureStream2/CaptureStream2.app"
 
   # Gatekeeper 警告を回避
