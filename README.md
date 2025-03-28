@@ -81,18 +81,19 @@ xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 1️⃣ スクリプトをダウンロード
 
 ターミナルで以下のコマンドを実行してください。
-
+```sh
 mkdir -p ~/CaptureStream2Installer
 cd ~/CaptureStream2Installer
 curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/install.sh
 chmod +x install.sh
-
+```
 
 2️⃣ インストールを実行
 
 以下のコマンドを実行すると、CaptureStream2 のインストールが開始されます。
-
+```sh
 　~/CaptureStream2Installer/install.sh
+```
 
 ---
 ## 🔹 アップデート手順
