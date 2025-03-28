@@ -1,9 +1,11 @@
 # 語学講座CS2(macOS版)
 
 語学講座CS2は、NHKラジオ語学講座の「らじる★らじる」（聴き逃し）ストリーミング配信を自動録音するためのアプリです。録音した語学講座のファイルは、著作権法で認められた範囲内でご利用ください。
+
 Homebrewを使って語学講座CS2をインストールする手順です。
 
 [語学講座CS2ホームページ](https://csreviser.github.io/CaptureStream2/)
+
 ※ 語学講座CS2の使用方法等は、[語学講座CS2のホームページ](https://csreviser.github.io/CaptureStream2/)をご覧下さい。
 
 ## 🚀 インストール方法
