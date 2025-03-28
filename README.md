@@ -5,6 +5,8 @@ Homebrewを使って語学講座CS2をインストールする手順です。
 
 ## 🚀 インストール方法
 
+### 🛠 方法 1: 手動でインストール
+
 ### 1. Homebrew をインストール（未導入の場合）
 
 Homebrew がインストールされていない場合は、次のコマンドを実行してください。
@@ -67,11 +69,31 @@ brew install --cask capturestream2
 
 以下のコマンドを実行すると、Gatekeeper の警告を回避できます。
 
-
-
 ```sh
 xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 ```
+
+---
+### 🛠 方法 2: install.sh を使う（推奨）
+
+以下のスクリプトを使用すると、Homebrew のセットアップ → CaptureStream2 のインストール → 必要なツール（ffmpeg）のインストール をすべて自動で実行できます。
+
+1️⃣ スクリプトをダウンロード
+
+ターミナルで以下のコマンドを実行してください。
+
+mkdir -p ~/CaptureStream2Installer
+cd ~/CaptureStream2Installer
+curl -O https://raw.githubusercontent.com/CSReviser/homebrew-capturestream2/main/install.sh
+chmod +x install.sh
+
+
+2️⃣ インストールを実行
+
+以下のコマンドを実行すると、CaptureStream2 のインストールが開始されます。
+
+　~/CaptureStream2Installer/install.sh
+
 ---
 ## 🔹 アップデート手順
 
@@ -91,7 +113,7 @@ xattr -r -d com.apple.quarantine /Applications/CaptureStream2.app
 ```
 または、「システム設定」 → 「プライバシーとセキュリティ」 から手動で許可してください。
 
-🚀 方法 2: アップデート用スクリプトを使う（推奨）
+### 🚀 方法 2: アップデート用スクリプトを使う（推奨）
 
 アップデート作業を自動化するスクリプトを用意しました。
 このスクリプトを使うことで、Homebrew の更新 → アプリのアップデート → Gatekeeper の制限解除 を一括で実行できます。
