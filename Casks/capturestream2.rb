@@ -37,7 +37,7 @@ cask "capturestream2" do
   # Gatekeeper 警告を回避
   postflight do
     system_command "/usr/bin/xattr",
-                   args: ["-r", "-d", "com.apple.quarantine", "/Applications/CaptureStream2.app"],
+                   args: ["-r", "-d", "com.apple.quarantine", "#{appdir}/CaptureStream2.app"],
                    sudo: false
   end
 
