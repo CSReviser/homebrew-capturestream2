@@ -31,7 +31,7 @@ jobs:
           # 既存のバージョンを取得
           OLD_VERSION=$(grep 'version "' $FILE_PATH | awk -F '"' '{print $2}')
           echo "現在のバージョン: $OLD_VERSION"
-
+          
           # 新しいバージョンと一致していればスキップ
           if [[ "$OLD_VERSION" == "$LATEST_VERSION" ]]; then
             echo "バージョンに変更がないため、更新をスキップします。"
@@ -54,6 +54,7 @@ jobs:
 
             # `capturestream2@バージョン` に対応するように修正
             sed -i "s/cask \"capturestream2\"/cask \"capturestream2@${OLD_VERSION}\"/g" "$OLD_CASK_PATH"
+            sed -i "s/version \"$LATEST_VERSION\"/version \"$OLD_VERSION\"/g" "$OLD_CASK_PATH"
             sed -i "s|CaptureStream2-MacOS-$LATEST_VERSION.dmg|CaptureStream2-MacOS-$OLD_VERSION.dmg|g" "$OLD_CASK_PATH"
           else
             echo "過去バージョンの Cask は既に存在するため、スキップ: $OLD_CASK_PATH"
