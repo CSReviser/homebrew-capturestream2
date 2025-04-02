@@ -1,4 +1,4 @@
-cask "capturestream2" do
+cask "capturestream2@" do
   version "20250324"
   sha256 :no_check  # バージョン管理されていない場合は no_check、リリースごとに更新するなら sha256 を入れる
 
