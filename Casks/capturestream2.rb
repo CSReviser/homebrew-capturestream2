@@ -1,5 +1,5 @@
 cask "capturestream2" do
-  version "20250324"
+  version "20290929"
   sha256 :no_check  # バージョン管理されていない場合は no_check、リリースごとに更新するなら sha256 を入れる
 
   # デフォルトのURL（ universal 最新）
