@@ -1,28 +1,13 @@
 cask "capturestream2" do
   version "20250324"
-  sha256 :no_check
+  sha256 :no_check  # バージョン管理されていない場合は no_check、リリースごとに更新するなら sha256 を入れる
+
+  # デフォルトのURL（ universal 最新）
   url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
 
   on_intel do
-    if MacOS.version <= :mojave
-      sha256 :no_check
+    if MacOS.version <= :catalina
       url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt5-Intel-#{version}.dmg"
-    elsif MacOS.version <= :catalina
-      sha256 :no_check
-      url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt5-Intel-#{version}.dmg"
-    else
-      sha256 :no_check
-      url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
-    end
-  end
-
-  on_arm do
-    if MacOS.version <= :big_sur
-      sha256 :no_check
-      url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
-    else
-      sha256 :no_check
-      url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
     end
   end
 
