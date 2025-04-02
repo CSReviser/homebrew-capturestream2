@@ -31,7 +31,7 @@ jobs:
           # 既存のバージョンを取得
           OLD_VERSION=$(grep 'version "' $FILE_PATH | awk -F '"' '{print $2}')
           echo "現在のバージョン: $OLD_VERSION"
-          
+
           # 新しいバージョンと一致していればスキップ
           if [[ "$OLD_VERSION" == "$LATEST_VERSION" ]]; then
             echo "バージョンに変更がないため、更新をスキップします。"
@@ -43,6 +43,22 @@ jobs:
           sed -i "s|/download/$OLD_VERSION/|/download/$LATEST_VERSION/|g" $FILE_PATH
           sed -i "s|CaptureStream2-MacOS-$OLD_VERSION.dmg|CaptureStream2-MacOS-$LATEST_VERSION.dmg|g" $FILE_PATH
 
+      - name: 過去バージョンの Cask を保存
+        run: |
+          OLD_CASK_PATH="Casks/capturestream2@${OLD_VERSION}.rb"
+
+          # 過去バージョンの Cask が存在しない場合のみ作成
+          if [[ ! -f "$OLD_CASK_PATH" ]]; then
+            echo "過去バージョンの Cask を作成: $OLD_CASK_PATH"
+            cp "Casks/capturestream2.rb" "$OLD_CASK_PATH"
+
+            # `capturestream2@バージョン` に対応するように修正
+            sed -i "s/cask \"capturestream2\"/cask \"capturestream2@${OLD_VERSION}\"/g" "$OLD_CASK_PATH"
+            sed -i "s|CaptureStream2-MacOS-$LATEST_VERSION.dmg|CaptureStream2-MacOS-$OLD_VERSION.dmg|g" "$OLD_CASK_PATH"
+          else
+            echo "過去バージョンの Cask は既に存在するため、スキップ: $OLD_CASK_PATH"
+          fi
+
       - name: 変更を GitHub にコミット & プッシュ
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +66,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add Casks/capturestream2.rb
+          git add Casks/capturestream2.rb Casks/capturestream2@*.rb
           git diff --cached --exit-code && echo "No changes to commit." && exit 0
-          git commit -m "Update CaptureStream2.rb to version $LATEST_VERSION"
+          git commit -m "Update CaptureStream2.rb to version $LATEST_VERSION and archive $OLD_VERSION"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
