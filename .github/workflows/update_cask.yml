@@ -29,8 +29,10 @@ jobs:
           FILE_PATH="Casks/capturestream2.rb"
 
           # 既存のバージョンを取得
-          OLD_VERSION=$(grep 'version "' $FILE_PATH | awk -F '"' '{print $2}')
+          OLD_VERSION=$(grep 'version "' "$FILE_PATH" | awk -F '"' '{print $2}')
           echo "現在のバージョン: $OLD_VERSION"
+          # 環境変数としてエクスポート（次のステップでも利用可能にする）
+          echo "OLD_VERSION=$OLD_VERSION" >> $GITHUB_ENV
           
           # 新しいバージョンと一致していればスキップ
           if [[ "$OLD_VERSION" == "$LATEST_VERSION" ]]; then
@@ -38,13 +40,15 @@ jobs:
             exit 0
           fi
 
-          # `capturestream2.rb` を更新
-          sed -i "s/version \"$OLD_VERSION\"/version \"$LATEST_VERSION\"/g" $FILE_PATH
-          sed -i "s|/download/$OLD_VERSION/|/download/$LATEST_VERSION/|g" $FILE_PATH
-          sed -i "s|CaptureStream2-MacOS-$OLD_VERSION.dmg|CaptureStream2-MacOS-$LATEST_VERSION.dmg|g" $FILE_PATH
+          # capturestream2.rb を更新
+          sed -i "s/version \"$OLD_VERSION\"/version \"$LATEST_VERSION\"/g" "$FILE_PATH"
+          sed -i "s|/download/$OLD_VERSION/|/download/$LATEST_VERSION/|g" "$FILE_PATH"
+          sed -i "s|CaptureStream2-MacOS-$OLD_VERSION.dmg|CaptureStream2-MacOS-$LATEST_VERSION.dmg|g" "$FILE_PATH"
 
       - name: 過去バージョンの Cask を保存
         run: |
+          # OLD_VERSION は GITHUB_ENV から取得できる
+          echo "使用する旧バージョン: ${OLD_VERSION}"
           OLD_CASK_PATH="Casks/capturestream2@${OLD_VERSION}.rb"
 
           # 過去バージョンの Cask が存在しない場合のみ作成
@@ -52,7 +56,7 @@ jobs:
             echo "過去バージョンの Cask を作成: $OLD_CASK_PATH"
             cp "Casks/capturestream2.rb" "$OLD_CASK_PATH"
 
-            # `capturestream2@バージョン` に対応するように修正
+            # cask 名とバージョンを修正
             sed -i "s/cask \"capturestream2\"/cask \"capturestream2@${OLD_VERSION}\"/g" "$OLD_CASK_PATH"
             sed -i "s/version \"$LATEST_VERSION\"/version \"$OLD_VERSION\"/g" "$OLD_CASK_PATH"
             sed -i "s|CaptureStream2-MacOS-$LATEST_VERSION.dmg|CaptureStream2-MacOS-$OLD_VERSION.dmg|g" "$OLD_CASK_PATH"
