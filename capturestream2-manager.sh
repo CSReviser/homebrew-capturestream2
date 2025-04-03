@@ -76,27 +76,30 @@ while true; do
       ;;
     6)
       # 最新版に戻す手順：アンインストール済みか確認し、最新版を再インストール
-      echo "最新版に戻すため、以下の手順を実行します。"
-      echo "まず、現在のインストール状況を確認します:"
+      echo "最新版に戻すため、現在のインストール状況を確認します:"
       brew list --cask
       echo ""
       echo "最新版とバージョン指定キャスクが混在している場合、ロールバック用キャスクを個別にアンインストールしてください。"
-      read -rp "最新版 ($LATEST_CASK) を再インストールするため、最新版キャスクのアンインストールを実行しますか？ [y/N]: " ans
-      if [[ "$ans" =~ ^[Yy]$ ]]; then
-        brew uninstall --cask "$LATEST_CASK"
+      read -rp "ロールバック用キャスクのアンインストールを行いますか？ [y/N]: " ans
+      if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
+        version=$(read_version)
+        ROLLBACK_CASK="capturestream2@${version}"
+        brew uninstall --cask "$ROLLBACK_CASK"
       fi
+
       echo "最新版 ($LATEST_CASK) を再インストールします..."
       brew install --cask "$LATEST_CASK"
       ;;
     7)
+      # 利用可能なバージョンの一覧表示
+      list_available_versions
+      ;;
+    8)
       echo "終了します。"
       exit 0
       ;;
     *)
-      echo "無効な選択です。1から7の数字を入力してください。"
+      echo "無効な選択肢です。1-8 を選んでください。"
       ;;
   esac
-  echo ""
-  read -rp "Enterキーを押してメニューに戻ります..."
 done
-     
