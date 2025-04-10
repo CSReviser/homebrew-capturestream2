@@ -1,0 +1,44 @@
+name: Test CaptureStream2 Manager (macOS)
+
+on:
+  push:
+    paths:
+      - 'capturestream2-manager.sh'
+      - '.github/workflows/test-capturestream2-manager.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        run: |
+          echo "Using Homebrew version:"
+          brew --version
+
+      - name: Add custom tap (replace with your tap URL)
+        run: |
+          brew tap your-username/your-tap
+
+      - name: Make script executable
+        run: chmod +x capturestream2-manager.sh
+
+      - name: Install latest version via script
+        run: ./capturestream2-manager.sh --install
+
+      - name: Verify installation
+        run: |
+          brew list --cask | grep capturestream2 || (echo "Cask not found!" && exit 1)
+
+      - name: Rollback to specific version (if available)
+        run: ./capturestream2-manager.sh --rollback 20250324 || echo "Rollback failed or version not found"
+
+      - name: Reset to latest version (if rollback worked)
+        run: ./capturestream2-manager.sh --reset 20250324 || echo "Reset failed"
+
+      - name: Uninstall latest version
+        run: ./capturestream2-manager.sh --uninstall
