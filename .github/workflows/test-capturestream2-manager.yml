@@ -20,25 +20,50 @@ jobs:
           echo "Using Homebrew version:"
           brew --version
 
-      - name: Add custom tap (replace with your tap URL)
+      - name: Add CSReviser/homebrew-capturestream2 tap
         run: |
-          brew tap CSReviser/homebrew-capturestream2
+          echo "Tapping CSReviser/homebrew-capturestream2..."
+          brew tap CSReviser/capturestream2
 
       - name: Make script executable
         run: chmod +x capturestream2-manager.sh
 
+      - name: List available CaptureStream2 versions
+        run: |
+          echo "===== 利用可能な CaptureStream2 バージョン一覧 ====="
+          brew search capturestream2
+
       - name: Install latest version via script
-        run: ./capturestream2-manager.sh --install
+        run: |
+          echo "===== 最新版のインストールをテスト中 ====="
+          ./capturestream2-manager.sh --install
 
       - name: Verify installation
         run: |
-          brew list --cask | grep capturestream2 || (echo "Cask not found!" && exit 1)
+          echo "===== インストール済みのキャスク一覧 ====="
+          brew list --cask
+          echo ""
+          echo "===== capturestream2 がインストールされているか確認中 ====="
+          brew list --cask | grep capturestream2 || (echo "capturestream2 が見つかりませんでした" && exit 1)
 
-      - name: Rollback to specific version (if available)
-        run: ./capturestream2-manager.sh --rollback 20250324 || echo "Rollback failed or version not found"
+      - name: Rollback to specific version (optional)
+        continue-on-error: true
+        run: |
+          echo "===== 指定バージョン（20250324）へのロールバックテスト中 ====="
+          ./capturestream2-manager.sh --rollback 20250324
 
-      - name: Reset to latest version (if rollback worked)
-        run: ./capturestream2-manager.sh --reset 20250324 || echo "Reset failed"
+      - name: Reset to latest version
+        continue-on-error: true
+        run: |
+          echo "===== ロールバックから最新版への復帰テスト中 ====="
+          ./capturestream2-manager.sh --reset 20250324
 
       - name: Uninstall latest version
-        run: ./capturestream2-manager.sh --uninstall
+        run: |
+          echo "===== アンインストール処理テスト中 ====="
+          ./capturestream2-manager.sh --uninstall
+
+      - name: Final installed cask list
+        run: |
+          echo "===== 最終状態の Homebrew キャスク一覧 ====="
+          brew list --cask || echo "brew list に失敗しました"
