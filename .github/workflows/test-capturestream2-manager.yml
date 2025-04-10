@@ -22,7 +22,7 @@ jobs:
 
       - name: Add custom tap (replace with your tap URL)
         run: |
-          brew tap your-username/your-tap
+          brew tap CSReviser/homebrew-capturestream2
 
       - name: Make script executable
         run: chmod +x capturestream2-manager.sh
