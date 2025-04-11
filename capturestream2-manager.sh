@@ -27,24 +27,26 @@ show_menu() {
 # 番号でバージョンを選ばせる関数
 select_version() {
   echo "利用可能な CaptureStream2 バージョン一覧:"
-  mapfile -t versions < <(brew search --cask capturestream2 | grep '^capturestream2@')
+  versions=$(brew search --cask | grep '^capturestream2@') # '--cask' を追加
 
-  if [ ${#versions[@]} -eq 0 ]; then
+  if [ -z "$versions" ]; then
     echo "ロールバック可能なバージョンは見つかりませんでした。"
     exit 1
   fi
 
-  for i in "${!versions[@]}"; do
-    printf "%2d) %s\n" "$((i+1))" "${versions[$i]}"
+  IFS=$'\n' read -rd '' -a versions_array <<<"$versions" # 結果を配列化
+
+  for i in "${!versions_array[@]}"; do
+    printf "%2d) %s\n" "$((i+1))" "${versions_array[$i]}"
   done
 
   read -rp "番号を選択してください: " index
-  if ! [[ "$index" =~ ^[0-9]+$ ]] || [ "$index" -lt 1 ] || [ "$index" -gt "${#versions[@]}" ]; then
+  if ! [[ "$index" =~ ^[0-9]+$ ]] || [ "$index" -lt 1 ] || [ "$index" -gt "${#versions_array[@]}" ]; then
     echo "無効な番号です。"
     exit 1
   fi
 
-  echo "${versions[$((index-1))]}"
+  echo "${versions_array[$((index-1))]}"
 }
 
 # 最新版キャスク名
@@ -78,7 +80,7 @@ while true; do
       fi
       brew reinstall --cask "$LATEST_CASK"
       ;;
-    9) brew search capturestream2 ;;
+    9) brew search --cask capturestream2 ;; # '--cask' を追加
     10) echo "終了します。"; exit 0 ;;
     *) echo "1-10 の番号を入力してください。" ;;
   esac
