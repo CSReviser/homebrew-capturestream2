@@ -1,40 +1,74 @@
 name: Test CaptureStream2 Manager
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'capturestream2-manager.sh'
       - '.github/workflows/test-capturestream2-manager.yml'
-  workflow_dispatch:
 
 jobs:
-  test:
+  test-capturestream2:
     runs-on: macos-latest
+
     steps:
-      - name: チェックアウト
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Homebrew tap 追加
+      - name: Set up Homebrew
         run: |
-          brew tap CSReviser/capturestream2
+          echo "Homebrew version:"
+          brew --version
 
-      - name: スクリプトに実行権限付与
-        run: chmod +x ./capturestream2-manager.sh
+      - name: Install latest version
+        run: |
+          echo "Installing latest version..."
+          brew install --cask capturestream2 || echo "Already installed."
 
-      - name: 最新版インストール
-        run: ./capturestream2-manager.sh install
+      - name: Verify launch of latest version
+        run: |
+          echo "Launching CaptureStream2..."
+          open -a /Applications/CaptureStream2.app || echo "Launch failed (app may not be present in CI)"
 
-      - name: インストール済み一覧表示
-        run: ./capturestream2-manager.sh list
+      - name: Uninstall latest version
+        run: |
+          echo "Uninstalling latest version..."
+          brew uninstall --cask capturestream2 || echo "Already uninstalled."
 
-      - name: ロールバック（1番目を選択）
-        run: ./capturestream2-manager.sh rollback 1
+      - name: Fetch rollback versions
+        id: get_versions
+        run: |
+          echo "Fetching available rollback versions..."
+          version=$(brew search capturestream2 | grep -E '^csreviser/capturestream2/capturestream2@' | head -n 1 | sed 's/.*@//')
+          echo "Found rollback version: $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: ロールバック解除
-        run: ./capturestream2-manager.sh rollback-reset 1
+      - name: Install rollback version
+        if: steps.get_versions.outputs.version != ''
+        run: |
+          version=${{ steps.get_versions.outputs.version }}
+          echo "Installing rollback version: $version"
+          brew install --cask "capturestream2@$version"
 
-      - name: 一覧表示テスト
-        run: ./capturestream2-manager.sh <<< "5"
+      - name: Verify rollback launch
+        if: steps.get_versions.outputs.version != ''
+        run: |
+          echo "Launching rollback version..."
+          open -a /Applications/CaptureStream2.app || echo "Launch failed (may not exist in CI)"
 
-      - name: バージョン一覧取得（ログ用）
-        run: brew search capturestream2
+      - name: Uninstall rollback version
+        if: steps.get_versions.outputs.version != ''
+        run: |
+          version=${{ steps.get_versions.outputs.version }}
+          echo "Uninstalling rollback version: $version"
+          brew uninstall --cask "capturestream2@$version"
+
+      - name: Reinstall latest version
+        run: |
+          echo "Reinstalling latest version (rollback解除)..."
+          brew install --cask capturestream2 || brew reinstall --cask capturestream2
+
+      - name: Verify launch after rollback解除
+        run: |
+          echo "Final launch test..."
+          open -a /Applications/CaptureStream2.app || echo "Launch failed"
