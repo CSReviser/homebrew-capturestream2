@@ -27,7 +27,7 @@ show_menu() {
 # 番号でバージョンを選ばせる関数
 select_version() {
   echo "利用可能な CaptureStream2 バージョン一覧:"
-  mapfile -t versions < <(brew search capturestream2 | grep '^capturestream2@')
+  mapfile -t versions < <(brew search --cask capturestream2 | grep '^capturestream2@')
 
   if [ ${#versions[@]} -eq 0 ]; then
     echo "ロールバック可能なバージョンは見つかりませんでした。"
