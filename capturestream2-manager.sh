@@ -1,9 +1,12 @@
 #!/bin/bash
-# capturestream2-manager.sh（番号選択式ロールバック対応版）
+# capturestream2-manager.sh
+# CaptureStream2 の管理スクリプト（番号選択式ロールバック対応）
 
-# brew コマンドの存在を確認
+LATEST_CASK="capturestream2"
+
+# brew コマンドの存在確認
 if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew がインストールされていません。"
+  echo "Homebrew がインストールされていません。https://brew.sh/ja/ をご確認ください。"
   exit 1
 fi
 
@@ -17,77 +20,79 @@ show_menu() {
   echo "4) 最新版のアップグレード（再インストール）"
   echo "5) インストール済みキャスクの一覧表示"
   echo "6) 指定バージョン（ロールバック）のインストール"
-  echo "7) 指定バージョンのアンインストール"
+  echo "7) 指定バージョン（ロールバック）のアンインストール"
   echo "8) 最新版に戻す（ロールバック解除）"
-  echo "9) 利用可能なキャスク一覧表示"
+  echo "9) 利用可能なキャスク一覧の表示"
   echo "10) 終了"
   echo "====================================="
 }
 
-# 番号でバージョンを選ばせる関数
-
+# ロールバックバージョン選択
 select_version() {
-  echo "利用可能な CaptureStream2 バージョン一覧:"
-  
-  # キャッシュの更新を明示
-  brew update --quiet
+  echo "利用可能なロールバックバージョンを取得中..."
+  versions=($(brew search capturestream2 | grep -E 'capturestream2@[0-9]{8}' | sed 's|.*/||'))
 
-  # 利用可能なバージョンを正確に取得
-  versions=$(brew search --casks | grep '^capturestream2@')
-
-  if [ -z "$versions" ]; then
-    echo "ロールバック可能なバージョンは見つかりませんでした。"
+  if [ ${#versions[@]} -eq 0 ]; then
+    echo "ロールバック可能なバージョンが見つかりませんでした。"
     exit 1
   fi
 
-  IFS=$'\n' read -rd '' -a versions_array <<<"$versions"
-
-  for i in "${!versions_array[@]}"; do
-    printf "%2d) %s\n" "$((i+1))" "${versions_array[$i]}"
+  echo "ロールバック可能なバージョン一覧:"
+  for i in "${!versions[@]}"; do
+    echo "$((i+1))) ${versions[$i]}"
   done
 
-  read -rp "番号を選択してください: " index
-  if ! [[ "$index" =~ ^[0-9]+$ ]] || [ "$index" -lt 1 ] || [ "$index" -gt "${#versions_array[@]}" ]; then
-    echo "無効な番号です。"
+  read -rp "番号を選んでください [1-${#versions[@]}]: " choice
+  if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#versions[@]} )); then
+    echo "${versions[$((choice-1))]}"
+  else
+    echo "無効な選択です。"
     exit 1
   fi
-
-  echo "${versions_array[$((index-1))]}"
 }
-
-# 最新版キャスク名
-LATEST_CASK="capturestream2"
 
 # メインループ
 while true; do
   show_menu
   read -rp "選択してください [1-10]: " choice
   case "$choice" in
-    1) brew install --cask "$LATEST_CASK" ;;
-    2) brew uninstall --cask "$LATEST_CASK" ;;
-    3) brew upgrade --cask "$LATEST_CASK" ;;
-    4) brew reinstall --cask "$LATEST_CASK" ;;
-    5) brew list --cask ;;
-    6)
-      selected=$(select_version)
-      brew install --cask "$selected"
+    1)
+      brew install --cask "$LATEST_CASK"
       ;;
-    7)
-      selected=$(select_version)
-      brew uninstall --cask "$selected"
+    2)
+      brew uninstall --cask "$LATEST_CASK"
       ;;
-    8)
-      echo "現在のインストール状況:"
-      brew list --cask
-      read -rp "ロールバック版のアンインストールを行いますか？ [y/N]: " ans
-      if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
-        selected=$(select_version)
-        brew uninstall --cask "$selected"
-      fi
+    3)
+      brew upgrade --cask "$LATEST_CASK"
+      ;;
+    4)
       brew reinstall --cask "$LATEST_CASK"
       ;;
-    9) brew search --cask capturestream2 ;; # '--cask' を追加
-    10) echo "終了します。"; exit 0 ;;
-    *) echo "1-10 の番号を入力してください。" ;;
+    5)
+      brew list --cask
+      ;;
+    6)
+      version=$(select_version)
+      brew install --cask "$version"
+      ;;
+    7)
+      version=$(select_version)
+      brew uninstall --cask "$version"
+      ;;
+    8)
+      version=$(select_version)
+      brew uninstall --cask "$version"
+      brew reinstall --cask "$LATEST_CASK"
+      ;;
+    9)
+      brew search capturestream2
+      ;;
+    10)
+      echo "終了します。"
+      exit 0
+      ;;
+    *)
+      echo "無効な選択肢です。"
+      ;;
   esac
 done
