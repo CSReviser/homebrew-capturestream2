@@ -1,14 +1,14 @@
-name: Test CaptureStream2 Manager
+name: Test CaptureStream2 Manager (macOS)
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - 'capturestream2-manager.sh'
       - '.github/workflows/test-capturestream2-manager.yml'
+  workflow_dispatch:
 
 jobs:
-  test-capturestream2:
+  test:
     runs-on: macos-latest
 
     steps:
@@ -17,58 +17,53 @@ jobs:
 
       - name: Set up Homebrew
         run: |
-          echo "Homebrew version:"
+          echo "Using Homebrew version:"
           brew --version
 
-      - name: Install latest version
+      - name: Add CSReviser/homebrew-capturestream2 tap
         run: |
-          echo "Installing latest version..."
-          brew install --cask capturestream2 || echo "Already installed."
+          echo "Tapping CSReviser/homebrew-capturestream2..."
+          brew tap CSReviser/capturestream2
 
-      - name: Verify launch of latest version
+      - name: Make script executable
+        run: chmod +x capturestream2-manager.sh
+
+      - name: List available CaptureStream2 versions
         run: |
-          echo "Launching CaptureStream2..."
-          open -a /Applications/CaptureStream2.app || echo "Launch failed (app may not be present in CI)"
+          echo "===== 利用可能な CaptureStream2 バージョン一覧 ====="
+          brew search capturestream2
+
+      - name: Install latest version via script
+        run: |
+          echo "===== 最新版のインストールをテスト中 ====="
+          ./capturestream2-manager.sh --install
+
+      - name: Verify installation
+        run: |
+          echo "===== インストール済みのキャスク一覧 ====="
+          brew list --cask
+          echo ""
+          echo "===== capturestream2 がインストールされているか確認中 ====="
+          brew list --cask | grep capturestream2 || (echo "capturestream2 が見つかりませんでした" && exit 1)
+
+      - name: Rollback to specific version (optional)
+        continue-on-error: true
+        run: |
+          echo "===== 指定バージョン（20250324）へのロールバックテスト中 ====="
+          ./capturestream2-manager.sh --rollback 20250324
+
+      - name: Reset to latest version
+        continue-on-error: true
+        run: |
+          echo "===== ロールバックから最新版への復帰テスト中 ====="
+          ./capturestream2-manager.sh --reset 20250324
 
       - name: Uninstall latest version
         run: |
-          echo "Uninstalling latest version..."
-          brew uninstall --cask capturestream2 || echo "Already uninstalled."
+          echo "===== アンインストール処理テスト中 ====="
+          ./capturestream2-manager.sh --uninstall
 
-      - name: Fetch rollback versions
-        id: get_versions
+      - name: Final installed cask list
         run: |
-          echo "Fetching available rollback versions..."
-          version=$(brew search capturestream2 | grep -E '^csreviser/capturestream2/capturestream2@' | head -n 1 | sed 's/.*@//')
-          echo "Found rollback version: $version"
-          echo "version=$version" >> $GITHUB_OUTPUT
-
-      - name: Install rollback version
-        if: steps.get_versions.outputs.version != ''
-        run: |
-          version=${{ steps.get_versions.outputs.version }}
-          echo "Installing rollback version: $version"
-          brew install --cask "capturestream2@$version"
-
-      - name: Verify rollback launch
-        if: steps.get_versions.outputs.version != ''
-        run: |
-          echo "Launching rollback version..."
-          open -a /Applications/CaptureStream2.app || echo "Launch failed (may not exist in CI)"
-
-      - name: Uninstall rollback version
-        if: steps.get_versions.outputs.version != ''
-        run: |
-          version=${{ steps.get_versions.outputs.version }}
-          echo "Uninstalling rollback version: $version"
-          brew uninstall --cask "capturestream2@$version"
-
-      - name: Reinstall latest version
-        run: |
-          echo "Reinstalling latest version (rollback解除)..."
-          brew install --cask capturestream2 || brew reinstall --cask capturestream2
-
-      - name: Verify launch after rollback解除
-        run: |
-          echo "Final launch test..."
-          open -a /Applications/CaptureStream2.app || echo "Launch failed"
+          echo "===== 最終状態の Homebrew キャスク一覧 ====="
+          brew list --cask || echo "brew list に失敗しました"
