@@ -25,16 +25,22 @@ show_menu() {
 }
 
 # 番号でバージョンを選ばせる関数
+
 select_version() {
   echo "利用可能な CaptureStream2 バージョン一覧:"
-  versions=$(brew search --cask | grep '^capturestream2@') # '--cask' を追加
+  
+  # キャッシュの更新を明示
+  brew update --quiet
+
+  # 利用可能なバージョンを正確に取得
+  versions=$(brew search --casks | grep '^capturestream2@')
 
   if [ -z "$versions" ]; then
     echo "ロールバック可能なバージョンは見つかりませんでした。"
     exit 1
   fi
 
-  IFS=$'\n' read -rd '' -a versions_array <<<"$versions" # 結果を配列化
+  IFS=$'\n' read -rd '' -a versions_array <<<"$versions"
 
   for i in "${!versions_array[@]}"; do
     printf "%2d) %s\n" "$((i+1))" "${versions_array[$i]}"
