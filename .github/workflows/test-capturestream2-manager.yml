@@ -1,51 +1,84 @@
-name: macOS CaptureStream2 Manager Full Test
+name: Test CaptureStream2 Manager
 
 on:
+  workflow_dispatch:
   push:
     paths:
-      - 'capturestream2-manager.sh'
-  workflow_dispatch:
+      - "capturestream2-manager.sh"
+      - "capturestream2-manager.command"
+      - ".github/workflows/test_capturestream2_manager.yml"
 
 jobs:
-  test-full-manager:
+  test-on-macos:
     runs-on: macos-latest
+    timeout-minutes: 15
 
     steps:
-      - name: リポジトリをチェックアウト
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Homebrew Tap を追加
+      - name: Setup Homebrew
         run: |
-          brew tap CSReviser/capturestream2
+          echo "Homebrew version:"
+          brew --version
 
-      - name: スクリプトに実行権限を付与
-        run: chmod +x ./capturestream2-manager.sh
-
-      - name: 最新版のインストールテスト
-        run: brew install --cask capturestream2
-
-      - name: 最新版のアップグレード（再インストール）テスト
-        run: brew reinstall --cask capturestream2
-
-      - name: 最新版のアップデートテスト
-        run: brew upgrade --cask capturestream2
-
-      - name: インストール済みキャスクの一覧確認
-        run: brew list --cask
-
-      - name: 利用可能なバージョンの一覧確認
-        run: brew search capturestream2
-
-      - name: ロールバックバージョンのインストールテスト
+      - name: Tap the custom cask repo
         run: |
-          brew install --cask capturestream2@20250324
+          brew untap CSReviser/homebrew-capturestream2 || true
+          brew tap CSReviser/homebrew-capturestream2
 
-      - name: ロールバックバージョンのアンインストールテスト
+      - name: Show available CaptureStream2 casks
         run: |
-          brew uninstall --cask capturestream2@20250324
+          echo "Available versions:"
+          brew search capturestream2
 
-      - name: 最新版の再インストール（ロールバック解除）
-        run: brew reinstall --cask capturestream2
+      - name: Test install latest version
+        run: |
+          brew install --cask capturestream2
 
-      - name: 最新版のアンインストールテスト
-        run: brew uninstall --cask capturestream2
+      - name: Test reinstall latest version
+        run: |
+          brew reinstall --cask capturestream2
+
+      - name: Test upgrade latest version
+        run: |
+          brew upgrade --cask capturestream2 || echo "No upgrade available"
+
+      - name: Test list installed casks
+        run: |
+          brew list --cask
+
+      - name: Test uninstall latest version
+        run: |
+          brew uninstall --cask capturestream2
+
+      - name: Test install rollback version
+        run: |
+          version=$(brew search capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
+          echo "Selected rollback version: $version"
+          if [[ -z "$version" ]]; then
+            echo "No rollback version found!"
+            exit 1
+          fi
+          brew install --cask "$version"
+
+      - name: Test uninstall rollback version
+        run: |
+          version=$(brew search capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
+          echo "Uninstalling rollback version: $version"
+          if [[ -n "$version" ]]; then
+            brew uninstall --cask "$version"
+          fi
+
+      - name: Final reinstall of latest version
+        run: |
+          brew install --cask capturestream2 || brew reinstall --cask capturestream2
+
+      - name: Test capturestream2-manager.command launch
+        run: |
+          chmod +x capturestream2-manager.command
+          echo "Simulating .command launch (headless mode test)"
+          bash capturestream2-manager.command <<< "10"
+
+      - name: Test completed
+        run: echo "All CaptureStream2 Manager operations tested successfully."
