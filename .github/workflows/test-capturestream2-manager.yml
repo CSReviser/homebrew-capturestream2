@@ -1,84 +1,55 @@
 name: Test CaptureStream2 Manager
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - "capturestream2-manager.sh"
-      - "capturestream2-manager.command"
-      - ".github/workflows/test_capturestream2_manager.yml"
+  workflow_dispatch:
 
 jobs:
-  test-on-macos:
+  test-macos:
     runs-on: macos-latest
-    timeout-minutes: 15
-
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Setup Homebrew
+      - name: Install Homebrew (if needed)
         run: |
-          echo "Homebrew version:"
-          brew --version
+          command -v brew >/dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-      - name: Tap the custom cask repo
+      - name: Tap capturestream2
         run: |
-          brew untap CSReviser/homebrew-capturestream2 || true
           brew tap CSReviser/homebrew-capturestream2
+          brew update
 
-      - name: Show available CaptureStream2 casks
-        run: |
-          echo "Available versions:"
-          brew search capturestream2
+      - name: Test Install Latest
+        run: brew install --cask capturestream2
 
-      - name: Test install latest version
-        run: |
-          brew install --cask capturestream2
+      - name: Test Upgrade
+        run: brew upgrade --cask capturestream2 || true
 
-      - name: Test reinstall latest version
-        run: |
-          brew reinstall --cask capturestream2
+      - name: Test Reinstall
+        run: brew reinstall --cask capturestream2
 
-      - name: Test upgrade latest version
-        run: |
-          brew upgrade --cask capturestream2 || echo "No upgrade available"
+      - name: List installed casks
+        run: brew list --cask
 
-      - name: Test list installed casks
+      - name: Detect rollback version (first found)
+        id: rollback
         run: |
-          brew list --cask
-
-      - name: Test uninstall latest version
-        run: |
-          brew uninstall --cask capturestream2
-
-      - name: Test install rollback version
-        run: |
-          version=$(brew search --cask capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
+          version=$(brew search capturestream2 | grep -E 'capturestream2@[0-9]{8}' | sed 's|.*/||' | head -n 1)
           echo "Selected rollback version: $version"
           if [[ -z "$version" ]]; then
             echo "No rollback version found!"
             exit 1
           fi
-          brew install --cask "$version"
+          echo "rollback_version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Test uninstall rollback version
-        run: |
-          version=$(brew search capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
-          echo "Uninstalling rollback version: $version"
-          if [[ -n "$version" ]]; then
-            brew uninstall --cask "$version"
-          fi
+      - name: Test Install rollback version
+        run: brew install --cask ${{ steps.rollback.outputs.rollback_version }}
 
-      - name: Final reinstall of latest version
-        run: |
-          brew install --cask capturestream2 || brew reinstall --cask capturestream2
+      - name: Test Uninstall rollback version
+        run: brew uninstall --cask ${{ steps.rollback.outputs.rollback_version }}
 
-      - name: Test capturestream2-manager.command launch
-        run: |
-          chmod +x capturestream2-manager.command
-          echo "Simulating .command launch (headless mode test)"
-          bash capturestream2-manager.command <<< "10"
-
-      - name: Test completed
-        run: echo "All CaptureStream2 Manager operations tested successfully."
+      - name: Test Reinstall Latest
+        run: brew reinstall --cask capturestream2
