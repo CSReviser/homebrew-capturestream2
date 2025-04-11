@@ -3,53 +3,41 @@ name: Test CaptureStream2 Manager
 on:
   push:
     paths:
-      - "capturestream2-manager.sh"
+      - 'capturestream2-manager.sh'
+      - '.github/workflows/test-capturestream2-manager.yml'
   workflow_dispatch:
 
 jobs:
-  test-macos:
+  test:
     runs-on: macos-latest
     steps:
-      - name: Check out repository
+      - name: チェックアウト
         uses: actions/checkout@v3
 
-      - name: Install Homebrew (if needed)
+      - name: Homebrew tap 追加
         run: |
-          command -v brew >/dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew tap CSReviser/capturestream2
 
-      - name: Tap capturestream2
+      - name: スクリプトに実行権限付与
+        run: chmod +x ./capturestream2-manager.sh
+
+      - name: 最新版インストール
+        run: ./capturestream2-manager.sh <<< "1"
+
+      - name: 一覧表示テスト
+        run: ./capturestream2-manager.sh <<< "5"
+
+      - name: バージョン一覧取得（ログ用）
+        run: brew search capturestream2
+
+      - name: ロールバック（自動選択）
         run: |
-          brew tap CSReviser/homebrew-capturestream2
-          brew update
+          VERSION=$(brew search capturestream2 | grep -E 'capturestream2@' | head -n 1 | sed 's/^capturestream2@//')
+          echo "Testing rollback version: $VERSION"
+          brew install --cask "capturestream2@${VERSION}"
 
-      - name: Test Install Latest
-        run: brew install --cask capturestream2
-
-      - name: Test Upgrade
-        run: brew upgrade --cask capturestream2 || true
-
-      - name: Test Reinstall
-        run: brew reinstall --cask capturestream2
-
-      - name: List installed casks
-        run: brew list --cask
-
-      - name: Detect rollback version (first found)
-        id: rollback
+      - name: ロールバック解除
         run: |
-          version=$(brew search capturestream2 | grep -E 'capturestream2@[0-9]{8}' | sed 's|.*/||' | head -n 1)
-          echo "Selected rollback version: $version"
-          if [[ -z "$version" ]]; then
-            echo "No rollback version found!"
-            exit 1
-          fi
-          echo "rollback_version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Test Install rollback version
-        run: brew install --cask ${{ steps.rollback.outputs.rollback_version }}
-
-      - name: Test Uninstall rollback version
-        run: brew uninstall --cask ${{ steps.rollback.outputs.rollback_version }}
-
-      - name: Test Reinstall Latest
-        run: brew reinstall --cask capturestream2
+          VERSION=$(brew search capturestream2 | grep -E 'capturestream2@' | head -n 1 | sed 's/^capturestream2@//')
+          brew uninstall --cask "capturestream2@${VERSION}"
+          brew reinstall --cask capturestream2
