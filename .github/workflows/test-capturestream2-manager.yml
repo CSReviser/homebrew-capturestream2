@@ -54,7 +54,7 @@ jobs:
 
       - name: Test install rollback version
         run: |
-          version=$(brew search capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
+          version=$(brew search --cask capturestream2 | grep -E '^capturestream2@[0-9]+' | head -n 1)
           echo "Selected rollback version: $version"
           if [[ -z "$version" ]]; then
             echo "No rollback version found!"
