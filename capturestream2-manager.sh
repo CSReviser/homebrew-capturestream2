@@ -1,14 +1,73 @@
 #!/bin/bash
 # capturestream2-manager.sh
-# CaptureStream2 の管理スクリプト（最新版・過去バージョンのインストール、アンインストール、アップデート、ロールバックなど）
+# CaptureStream2 管理スクリプト（対話/非対話両対応）
 
-# brew コマンドの存在を確認
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew がインストールされていません。"
-  exit 1
+LATEST_CASK="capturestream2"
+
+print_usage() {
+  echo "使用方法:"
+  echo "  $0 [--install | --uninstall | --upgrade | --reinstall | --list-installed |"
+  echo "      --rollback VERSION | --unrollback VERSION | --reset VERSION | --list-available]"
+  echo "  引数なしで起動すると対話モードになります。"
+}
+
+# CLI引数モード
+if [[ $# -gt 0 ]]; then
+  case "$1" in
+    --install)
+      brew install --cask "$LATEST_CASK"
+      ;;
+    --uninstall)
+      brew uninstall --cask "$LATEST_CASK"
+      ;;
+    --upgrade)
+      brew upgrade --cask "$LATEST_CASK"
+      ;;
+    --reinstall)
+      brew reinstall --cask "$LATEST_CASK"
+      ;;
+    --list-installed)
+      brew list --cask
+      ;;
+    --rollback)
+      if [[ -z "$2" ]]; then
+        echo "エラー: バージョン番号が指定されていません。"
+        exit 1
+      fi
+      brew install --cask "capturestream2@$2"
+      ;;
+    --unrollback)
+      if [[ -z "$2" ]]; then
+        echo "エラー: バージョン番号が指定されていません。"
+        exit 1
+      fi
+      brew uninstall --cask "capturestream2@$2"
+      ;;
+    --reset)
+      if [[ -z "$2" ]]; then
+        echo "エラー: バージョン番号が指定されていません。"
+        exit 1
+      fi
+      brew uninstall --cask "capturestream2@$2"
+      brew reinstall --cask "$LATEST_CASK"
+      ;;
+    --list-available)
+      brew search capturestream2
+      ;;
+    --help|-h)
+      print_usage
+      ;;
+    *)
+      echo "不明なオプション: $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+  exit 0
 fi
 
-# メニュー表示用関数
+# === 対話モード ===
+
 show_menu() {
   echo "====================================="
   echo "CaptureStream2 管理メニュー"
@@ -25,34 +84,13 @@ show_menu() {
   echo "====================================="
 }
 
-LATEST_CASK="capturestream2"
-
-select_version() {
-  echo "利用可能なバージョンを取得中..."
-  versions=($(brew search capturestream2 | grep -E '^csreviser/capturestream2/capturestream2@' | sed 's/.*@//'))
-  if [ ${#versions[@]} -eq 0 ]; then
-    echo "利用可能なバージョンが見つかりませんでした。"
-    return 1
+read_version() {
+  read -rp "対象のバージョン番号を入力してください（例: 20250324）: " input_version
+  if [ -z "$input_version" ]; then
+    echo "バージョン番号が入力されなかったため、処理を中止します。"
+    exit 1
   fi
-
-  echo "ロールバック可能なバージョン一覧:"
-  for i in "${!versions[@]}"; do
-    echo "$((i+1))) ${versions[$i]}"
-  done
-
-  read -rp "番号で選択してください (1-${#versions[@]}): " num
-  if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#versions[@]}" ]; then
-    SELECTED_VERSION="${versions[$((num-1))]}"
-    return 0
-  else
-    echo "無効な選択肢です。"
-    return 1
-  fi
-}
-
-list_available_versions() {
-  echo "利用可能な CaptureStream2 キャスクの一覧:"
-  brew search capturestream2
+  echo "$input_version"
 }
 
 while true; do
@@ -60,46 +98,35 @@ while true; do
   read -rp "選択してください [1-10]: " choice
   case "$choice" in
     1)
-      echo "最新版 ($LATEST_CASK) をインストールします..."
       brew install --cask "$LATEST_CASK"
       ;;
     2)
-      echo "最新版 ($LATEST_CASK) をアンインストールします..."
       brew uninstall --cask "$LATEST_CASK"
       ;;
     3)
-      echo "最新版 ($LATEST_CASK) を更新（アップデート）します..."
       brew upgrade --cask "$LATEST_CASK"
       ;;
     4)
-      echo "最新版 ($LATEST_CASK) を再インストールします..."
       brew reinstall --cask "$LATEST_CASK"
       ;;
     5)
-      echo "インストール済みキャスク一覧:"
       brew list --cask
       ;;
     6)
-      if select_version; then
-        echo "バージョン ${SELECTED_VERSION} をインストールします..."
-        brew install --cask "capturestream2@${SELECTED_VERSION}"
-      fi
+      version=$(read_version)
+      brew install --cask "capturestream2@$version"
       ;;
     7)
-      if select_version; then
-        echo "バージョン ${SELECTED_VERSION} をアンインストールします..."
-        brew uninstall --cask "capturestream2@${SELECTED_VERSION}"
-      fi
+      version=$(read_version)
+      brew uninstall --cask "capturestream2@$version"
       ;;
     8)
-      if select_version; then
-        echo "ロールバックバージョン capturestream2@${SELECTED_VERSION} をアンインストールして最新版へ戻します..."
-        brew uninstall --cask "capturestream2@${SELECTED_VERSION}"
-        brew reinstall --cask "$LATEST_CASK"
-      fi
+      version=$(read_version)
+      brew uninstall --cask "capturestream2@$version"
+      brew reinstall --cask "$LATEST_CASK"
       ;;
     9)
-      list_available_versions
+      brew search capturestream2
       ;;
     10)
       echo "終了します。"
