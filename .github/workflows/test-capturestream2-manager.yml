@@ -22,22 +22,19 @@ jobs:
         run: chmod +x ./capturestream2-manager.sh
 
       - name: 最新版インストール
-        run: ./capturestream2-manager.sh <<< "1"
+        run: ./capturestream2-manager.sh install
+
+      - name: インストール済み一覧表示
+        run: ./capturestream2-manager.sh list
+
+      - name: ロールバック（1番目を選択）
+        run: ./capturestream2-manager.sh rollback 1
+
+      - name: ロールバック解除
+        run: ./capturestream2-manager.sh rollback-reset 1
 
       - name: 一覧表示テスト
         run: ./capturestream2-manager.sh <<< "5"
 
       - name: バージョン一覧取得（ログ用）
         run: brew search capturestream2
-
-      - name: ロールバック（自動選択）
-        run: |
-          VERSION=$(brew search capturestream2 | grep -E 'capturestream2@' | head -n 1 | sed 's/^capturestream2@//')
-          echo "Testing rollback version: $VERSION"
-          brew install --cask "capturestream2@${VERSION}"
-
-      - name: ロールバック解除
-        run: |
-          VERSION=$(brew search capturestream2 | grep -E 'capturestream2@' | head -n 1 | sed 's/^capturestream2@//')
-          brew uninstall --cask "capturestream2@${VERSION}"
-          brew reinstall --cask capturestream2
