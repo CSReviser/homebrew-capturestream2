@@ -1,69 +1,51 @@
-name: Test CaptureStream2 Manager (macOS)
+name: macOS CaptureStream2 Manager Full Test
 
 on:
   push:
     paths:
       - 'capturestream2-manager.sh'
-      - '.github/workflows/test-capturestream2-manager.yml'
   workflow_dispatch:
 
 jobs:
-  test:
+  test-full-manager:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
+      - name: リポジトリをチェックアウト
         uses: actions/checkout@v3
 
-      - name: Set up Homebrew
+      - name: Homebrew Tap を追加
         run: |
-          echo "Using Homebrew version:"
-          brew --version
-
-      - name: Add CSReviser/homebrew-capturestream2 tap
-        run: |
-          echo "Tapping CSReviser/homebrew-capturestream2..."
           brew tap CSReviser/capturestream2
 
-      - name: Make script executable
-        run: chmod +x capturestream2-manager.sh
+      - name: スクリプトに実行権限を付与
+        run: chmod +x ./capturestream2-manager.sh
 
-      - name: List available CaptureStream2 versions
-        run: |
-          echo "===== 利用可能な CaptureStream2 バージョン一覧 ====="
-          brew search capturestream2
+      - name: 最新版のインストールテスト
+        run: brew install --cask capturestream2
 
-      - name: Install latest version via script
-        run: |
-          echo "===== 最新版のインストールをテスト中 ====="
-          ./capturestream2-manager.sh --install
+      - name: 最新版のアップグレード（再インストール）テスト
+        run: brew reinstall --cask capturestream2
 
-      - name: Verify installation
-        run: |
-          echo "===== インストール済みのキャスク一覧 ====="
-          brew list --cask
-          echo ""
-          echo "===== capturestream2 がインストールされているか確認中 ====="
-          brew list --cask | grep capturestream2 || (echo "capturestream2 が見つかりませんでした" && exit 1)
+      - name: 最新版のアップデートテスト
+        run: brew upgrade --cask capturestream2
 
-      - name: Rollback to specific version (optional)
-        continue-on-error: true
-        run: |
-          echo "===== 指定バージョン（20250324）へのロールバックテスト中 ====="
-          ./capturestream2-manager.sh --rollback 20250324
+      - name: インストール済みキャスクの一覧確認
+        run: brew list --cask
 
-      - name: Reset to latest version
-        continue-on-error: true
-        run: |
-          echo "===== ロールバックから最新版への復帰テスト中 ====="
-          ./capturestream2-manager.sh --reset 20250324
+      - name: 利用可能なバージョンの一覧確認
+        run: brew search capturestream2
 
-      - name: Uninstall latest version
+      - name: ロールバックバージョンのインストールテスト
         run: |
-          echo "===== アンインストール処理テスト中 ====="
-          ./capturestream2-manager.sh --uninstall
+          brew install --cask capturestream2@20250324
 
-      - name: Final installed cask list
+      - name: ロールバックバージョンのアンインストールテスト
         run: |
-          echo "===== 最終状態の Homebrew キャスク一覧 ====="
-          brew list --cask || echo "brew list に失敗しました"
+          brew uninstall --cask capturestream2@20250324
+
+      - name: 最新版の再インストール（ロールバック解除）
+        run: brew reinstall --cask capturestream2
+
+      - name: 最新版のアンインストールテスト
+        run: brew uninstall --cask capturestream2
