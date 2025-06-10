@@ -6,7 +6,7 @@ cask "capturestream2" do
   url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
 
   on_intel do
-    if MacOS.version <= :Big_Sur
+    if MacOS.version <= :big_sur
       url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt5-Intel-#{version}.dmg"
     end
   end
