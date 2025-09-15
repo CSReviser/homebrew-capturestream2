@@ -21,9 +21,19 @@ cask "capturestream2" do
 
   # Gatekeeper 警告を回避
   postflight do
+    # Gatekeeperの隔離属性を削除
     system_command "/usr/bin/xattr",
                    args: ["-r", "-d", "com.apple.quarantine", "#{appdir}/CaptureStream2.app"],
-                   sudo: false
+                   sudo: false,
+                   print_stderr: true,
+                   print_stdout: true
+
+    # ad hoc署名を付与（Apple Developer ID不要）
+    system_command "/usr/bin/codesign",
+                   args: ["--force", "--deep", "--sign", "-", "#{appdir}/CaptureStream2.app"],
+                   sudo: false,
+                   print_stderr: true,
+                   print_stdout: true
   end
 
   caveats <<~EOS
