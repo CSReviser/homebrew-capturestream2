@@ -5,10 +5,23 @@ cask "capturestream2" do
   # デフォルトのURL（ universal 最新）
   url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
 
-  on_intel do
-    if MacOS.version <= :big_sur
-      url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt5-Intel-#{version}.dmg"
-    end
+  # macOS 13 (Ventura) 以上 → Qt6.11（最新 universal）
+  on_ventura :or_newer do
+    url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-#{version}.dmg"
+  end
+
+  # macOS 11–12 → Qt6.5
+  on_big_sur do
+    url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt6-5-#{version}.dmg"
+  end
+
+  on_monterey do
+    url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt6-5-#{version}.dmg"
+  end
+
+  # macOS 10.14 / 10.15 → Qt6.2
+  on_catalina :or_older do
+    url "https://github.com/CSReviser/CaptureStream2/releases/download/#{version}/CaptureStream2-MacOS-qt6-2-#{version}.dmg"
   end
 
   name "CaptureStream2"
